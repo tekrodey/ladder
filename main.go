@@ -47,7 +47,7 @@ func main() {
 		Handler:      handler,
 		ReadTimeout:  *timeout,
 		WriteTimeout: *timeout + 10*time.Second, // bumped extra buffer from 5s to 10s
-		IdleTimeout:  180 * time.Second, // increased from 120s to 180s to keep connections alive longer
+		IdleTimeout:  240 * time.Second, // personal preference: 240s to handle slower home network connections
 	}
 
 	// Start server in a goroutine so we can listen for shutdown signals
