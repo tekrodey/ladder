@@ -22,7 +22,7 @@ func main() {
 	var (
 		addr    = flag.String("addr", getEnv("LADDER_ADDR", ":8080"), "address to listen on")
 		proxyURL = flag.String("proxy", getEnv("LADDER_PROXY", ""), "upstream proxy URL")
-		timeout = flag.Duration("timeout", 60*time.Second, "request timeout") // increased from 30s; some slow sites need more time
+		timeout = flag.Duration("timeout", 90*time.Second, "request timeout") // increased from 60s; some slow sites need even more time
 		showVersion = flag.Bool("version", false, "print version and exit")
 	)
 	flag.Parse()
@@ -46,7 +46,7 @@ func main() {
 		Addr:         *addr,
 		Handler:      handler,
 		ReadTimeout:  *timeout,
-		WriteTimeout: *timeout + 5*time.Second,
+		WriteTimeout: *timeout + 10*time.Second, // bumped extra buffer from 5s to 10s
 		IdleTimeout:  120 * time.Second,
 	}
 
