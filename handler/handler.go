@@ -14,7 +14,7 @@ import (
 
 const (
 	// DefaultUserAgent mimics a common browser to avoid bot detection
-	DefaultUserAgent = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+	DefaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 	// MaxResponseSize limits the size of proxied responses to 10MB
 	MaxResponseSize = 10 * 1024 * 1024
 	// RequestTimeout is the maximum time allowed for a proxied request
@@ -104,7 +104,3 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Limit response body size
 	limitedReader := io.LimitReader(resp.Body, MaxResponseSize)
-	if _, err := io.Copy(w, limitedReader); err != nil {
-		log.Printf("error writing response: %v", err)
-	}
-}
