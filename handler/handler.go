@@ -18,7 +18,8 @@ const (
 	// MaxResponseSize limits the size of proxied responses to 10MB
 	MaxResponseSize = 10 * 1024 * 1024
 	// RequestTimeout is the maximum time allowed for a proxied request
-	RequestTimeout = 30 * time.Second
+	// Increased from 30s to 45s to better handle slow news sites
+	RequestTimeout = 45 * time.Second
 )
 
 // Handler holds configuration and dependencies for the proxy handler.
@@ -103,4 +104,3 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 
 	// Limit response body size
-	limit
