@@ -20,6 +20,8 @@ const (
 	// RequestTimeout is the maximum time allowed for a proxied request
 	// Increased from 30s to 45s to better handle slow news sites
 	RequestTimeout = 45 * time.Second
+	// MaxRedirects is the maximum number of redirects to follow before giving up
+	MaxRedirects = 5
 )
 
 // Handler holds configuration and dependencies for the proxy handler.
@@ -38,8 +40,8 @@ func New(userAgent, rulesFile string) *Handler {
 		client: &http.Client{
 			Timeout: RequestTimeout,
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				if len(via) >= 10 {
-					return fmt.Errorf("too many redirects")
+				if len(via) >= MaxRedirects {
+					return fmt.Errorf("too many redirects (max %d)", MaxRedirects)
 				}
 				return nil
 			},
@@ -101,6 +103,3 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	w.WriteHeader(resp.StatusCode)
-
-	// Limit response body size
