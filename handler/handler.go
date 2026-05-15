@@ -21,7 +21,8 @@ const (
 	// Increased from 30s to 45s to better handle slow news sites
 	RequestTimeout = 45 * time.Second
 	// MaxRedirects is the maximum number of redirects to follow before giving up
-	MaxRedirects = 5
+	// Bumped from 5 to 10 since some sites (e.g. behind CDNs) chain several redirects
+	MaxRedirects = 10
 )
 
 // Handler holds configuration and dependencies for the proxy handler.
@@ -97,9 +98,4 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	// Copy relevant response headers
-	for _, header := range []string{"Content-Type", "Content-Language", "Last-Modified"} {
-		if val := resp.Header.Get(header); val != "" {
-			w.Header().Set(header, val)
-		}
-	}
-
+	for _, header := range []string{"Content-Typ
