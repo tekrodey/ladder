@@ -100,17 +100,17 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	// Copy response headers to the client, skipping hop-by-hop headers.
+	// Copy response headers to the client
 	for key, values := range resp.Header {
-		for _, v := range values {
-			w.Header().Add(key, v)
+		for _, value := range values {
+			w.Header().Add(key, value)
 		}
 	}
 	w.WriteHeader(resp.StatusCode)
 
-	// Limit the response body to MaxResponseSize to avoid memory exhaustion.
-	_, copyErr := io.Copy(w, io.LimitReader(resp.Body, MaxResponseSize))
-	if copyErr != nil {
-		log.Printf("error copying response body: %v", copyErr)
+	// Limit response body size to avoid memory exhaustion
+	limitedBody := io.LimitReader(resp.Body, MaxResponseSize)
+	if _, err := io.Copy(w, limitedBody); err != nil {
+		log.Printf("error copying response body: %v", err)
 	}
 }
