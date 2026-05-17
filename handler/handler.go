@@ -89,8 +89,8 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	req.Header.Set("User-Agent", h.userAgent)
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.5")
-	// Hint to servers that we prefer an uncompressed response so we don't need
-	// to deal with decompressing gzip/br streams ourselves.
+	// Request identity encoding so we receive plain bytes without needing to
+	// decompress gzip/br streams. Some proxies ignore this, but it's worth trying.
 	req.Header.Set("Accept-Encoding", "identity")
 
 	resp, err := h.client.Do(req)
@@ -99,3 +99,18 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer resp.Body.Close()
+
+	// Copy response headers to the client, skipping hop-by-hop headers.
+	for key, values := range resp.Header {
+		for _, v := range values {
+			w.Header().Add(key, v)
+		}
+	}
+	w.WriteHeader(resp.StatusCode)
+
+	// Limit the response body to MaxResponseSize to avoid memory exhaustion.
+	_, copyErr := io.Copy(w, io.LimitReader(resp.Body, MaxResponseSize))
+	if copyErr != nil {
+		log.Printf("error copying response body: %v", copyErr)
+	}
+}
